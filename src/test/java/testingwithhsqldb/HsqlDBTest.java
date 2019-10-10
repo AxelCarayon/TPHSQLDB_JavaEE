@@ -62,12 +62,65 @@ public class HsqlDBTest {
 		String name = myObject.nameOfCustomer(-1);
 		assertNull("name should be null, customer does not exist !", name);
 	}
-
-	public static DataSource getDataSource() {
-		org.hsqldb.jdbc.JDBCDataSource ds = new org.hsqldb.jdbc.JDBCDataSource();
-		ds.setDatabase("jdbc:hsqldb:mem:testcase;shutdown=true");
-		ds.setUser("sa");
-		ds.setPassword("sa");
-		return ds;
-	}	
+        
+        /**
+         * teste si on trouve bien un produit existant
+         * @throws SQLException 
+         */
+        @Test
+	public void findProduct() throws SQLException {
+            ProductEntity p = myObject.findProduct(0); //produit trouvable dans bigtestdata.sql
+            assertEquals("Iron Iron", p.getName());
+            assertEquals(54.0, p.getPrice(),0.0001); // prix de 54.0 avec une précision de 0.0001 près
+	}
+        
+        /**
+         * teste si on obtient bien null en cherchant un produit non existant
+         * @throws SQLException 
+         */
+        @Test
+	public void findProductNotExisting() throws SQLException {
+            assertNull(myObject.findProduct(-1));
+	}
+        
+        /**
+         * teste qu'on ne peut insérer un produit avec un prix non positif.
+         * @throws SQLException 
+         */
+        @Test(expected = SQLException.class)
+	public void negativePriceProduct() throws SQLException {
+            ProductEntity neg = new ProductEntity(50, "Negative price product", -2.00);
+            myObject.addProduct(neg);
+	}
+        
+        /**
+         * teste que un nouveau produit est correctement créé.
+         * @throws SQLException 
+         */
+        @Test
+	public void newProduct() throws SQLException {
+            ProductEntity nouv = new ProductEntity(50, "New product", 15.24);
+            myObject.addProduct(nouv);
+            assertEquals(nouv, myObject.findProduct(50));
+	}
+        
+        /**
+         * teste le renvoi d'une erreur si on essaye de rajouter dans la base un 
+         * produit avec une clef déjà utilisée
+         * @throws SQLException 
+         */
+        @Test(expected = SQLException.class)
+	public void cantAddExistingKey() throws SQLException {
+            ProductEntity existe = new ProductEntity(0, "Product with existing key", 25.24);
+            myObject.addProduct(existe);
+	}
+        
+        
+       	public static DataSource getDataSource() {
+            org.hsqldb.jdbc.JDBCDataSource ds = new org.hsqldb.jdbc.JDBCDataSource();
+            ds.setDatabase("jdbc:hsqldb:mem:testcase;shutdown=true");
+            ds.setUser("sa");
+            ds.setPassword("sa");
+            return ds;
+	}
 }

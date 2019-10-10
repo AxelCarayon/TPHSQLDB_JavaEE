@@ -49,11 +49,16 @@ public class DAO {
 		try (   Connection connection = myDataSource.getConnection();
 			PreparedStatement stmt = connection.prepareStatement(sql)
                 ) {
-			stmt.setInt(1, p.getId());
+                    if (p.getPrice()<0.0){
+                        throw new SQLException("Erreur : le produit n'as pas un prix positif"); 
+                    }
+                    else{
+                        stmt.setInt(1, p.getId());
 			stmt.setString(2, p.getName());
 			stmt.setDouble(3, p.getPrice());
 
 			stmt.executeUpdate();
+                    }
 
 		}
                 

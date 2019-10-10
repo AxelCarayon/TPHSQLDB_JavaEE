@@ -5,6 +5,9 @@
  */
 package testingwithhsqldb;
 
+import java.util.Objects;
+import static jdk.nashorn.internal.objects.NativeMath.round;
+
 /**
  *
  * @author Axel
@@ -43,6 +46,15 @@ public class ProductEntity {
     public void setPrice(double price) {
         this.price = price;
     }
+    
+    @Override
+	public boolean equals(Object obj) {
+            //Override de la méthode equals pour comparer deux produits
+            ProductEntity test = (ProductEntity)obj;
+            return (test.getId() == this.getId() &&
+                    test.getName().equals(this.getName()) &&
+                round(test.getPrice(),2) == round(this.getPrice(),2));
+	}
     
     @Override
     public String toString() {
